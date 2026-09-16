@@ -1,0 +1,3 @@
+Contact: https://zm-hybrid-store.pages.dev/
+Canonical: https://zm-hybrid-store.pages.dev/security.txt
+Preferred-Languages: en, ur

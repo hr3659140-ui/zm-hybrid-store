@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /account/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /wishlist/
+Disallow: /track-order/
+Disallow: /order/
+Disallow: /affiliate/
+Disallow: /admin/update-password/
+
+Sitemap: https://zm-hybrid-store.pages.dev/sitemap.txt
+Sitemap: https://zm-hybrid-store.pages.dev/sitemap.xml

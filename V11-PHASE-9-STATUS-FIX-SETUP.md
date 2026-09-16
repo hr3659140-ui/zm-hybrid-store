@@ -1,0 +1,1 @@
+Run supabase/phase9-status-fix.sql once, then deploy this ZIP to Cloudflare Production. Existing data is preserved.

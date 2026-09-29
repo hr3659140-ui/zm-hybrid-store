@@ -1,1 +1,5 @@
-/*  /index.html  200
+# ZM Hybrid Store — explicit app entry points
+/admin /admin/index.html 200
+/admin/ /admin/index.html 200
+/affiliate /affiliate/index.html 200
+/affiliate/ /affiliate/index.html 200

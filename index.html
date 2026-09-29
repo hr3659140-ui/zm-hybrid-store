@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-94TKM8BY1X"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-94TKM8BY1X');
-</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZM Hybrid Store — Beauty, Home & Lifestyle Essentials</title>
@@ -32,9 +23,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=Caveat:wght@500;600&family=Manrope:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="design-v2.css?v=novella1">
+<link rel="stylesheet" href="velora.css?v=1">
 
 <!-- ===== Google Analytics — paste your GA4 ID in script.js CONFIG.GA_MEASUREMENT_ID, then uncomment below ===== -->
 <!--
@@ -62,92 +53,69 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+<body class="velora">
 
-<!-- ============ TOP UTILITY BAR ============ -->
-<div class="topbar">
-  <div class="topbar__inner">
-    <div class="topbar__left"><span>🚚 Free shipping on orders over Rs. 5,000</span><i></i><span>Easy 7-day returns</span></div>
-    <div class="topbar__right"><a href="/track-order/" data-link>Track Order</a><i></i><a href="/contact/" data-link>Help Center</a><i></i><a href="/affiliate/">Sell with Us</a></div>
-  </div>
-  <div class="announce" hidden><div class="announce__track"></div></div>
-</div>
+<!-- ============ TOP BAR ============ -->
+<div class="vx-topbar"><div class="vx-wrap">
+  <ul>
+    <li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h11v9H2zM13 9h4l3 3v3h-7"/><circle cx="6" cy="17" r="1.6"/><circle cx="16" cy="17" r="1.6"/></svg><span>Free Shipping on Orders Above ₹999</span></li>
+    <li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5"/></svg><span>Easy 7 Days Returns</span></li>
+    <li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.3 2.8 1-5.9-4.2-4.1 5.9-.8z"/></svg><span>Exclusive Offers on New Arrivals</span></li>
+  </ul>
+  <a href="/contact/" class="vx-cta" data-link>CONTACT US NOW &rarr;</a>
+</div></div>
 
 <!-- ============ HEADER ============ -->
-<header class="site-header">
-  <div class="site-header__inner">
-    <button class="icon-btn nav-toggle" id="navToggle" aria-label="Open menu">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-    </button>
-    <a href="/" class="brand" data-link>
-      <span class="brand__mark"><svg width="30" height="30" viewBox="0 0 32 32"><path d="M2 5l9 7 5-4 5 4 9-7v22l-9-7-5 4-5-4-9 7z" fill="currentColor"/></svg></span>
-      <span class="brand__name">ZM HYBRID</span>
-    </a>
-    <div class="search-bar open" id="searchBar">
-      <select id="searchCatSelect" aria-label="Category" hidden><option value=""></option></select>
-      <input type="text" id="searchInput" placeholder="Search products, brands and more…" autocomplete="off">
-      <button id="searchGo" aria-label="Search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-    </div>
-    <div class="header-actions">
-      <a href="/account/" class="account-header-link" data-link aria-label="Account / Login">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M5 20c.7-3.3 3.2-5 7-5s6.3 1.7 7 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        <small>Account</small>
-      </a>
-      <button class="icon-btn icon-btn--labeled" id="wishToggle" aria-label="Wishlist">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-        <span class="badge" id="wishCount">0</span><small>Wishlist</small>
-      </button>
-      <button class="icon-btn icon-btn--labeled" id="cartToggle" aria-label="Cart">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l1.6 10.6a2 2 0 0 0 2 1.7h8.2a2 2 0 0 0 2-1.6L20 8H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.4" fill="currentColor"/><circle cx="17" cy="20" r="1.4" fill="currentColor"/></svg>
-        <span class="badge" id="cartCount">0</span><small>Cart</small>
-      </button>
-      <button class="icon-btn" id="searchToggle" aria-label="Search" hidden></button>
-    </div>
-  </div>
-  <div class="nav-wrap">
-    <nav class="main-nav" id="mainNav">
-      <a href="/catalog/" data-link class="nav-cats"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><b>Categories</b></a>
-      <a href="/catalog/?sort=newest" data-link>New Arrivals</a>
-      <a href="/catalog/?sale=1" data-link class="nav-hot">Top Deals<em>Hot</em></a>
-      <a href="/catalog/?featured=1" data-link>Best Sellers</a>
-      <a href="/category/home-and-kitchen/" data-link>Home Essentials</a>
-      <a href="/category/electronics/" data-link>Electronics</a>
-      <a href="/category/watches/" data-link>Watches</a>
-      <a href="/category/health-and-beauty/" data-link>Beauty</a>
-      <a href="/category/fragrance/" data-link>Fragrance</a>
-      <a href="/contact/" data-link>Contact</a>
+<header class="site-header vx-header">
+  <div class="vx-wrap">
+    <button class="icon-btn nav-toggle" id="navToggle" aria-label="Open menu"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+    <a href="/" class="vx-brand" data-link aria-label="ZM Hybrid Store home"><b>ZM</b><small>HYBRID STORE</small></a>
+    <nav class="vx-nav" id="mainNav">
+      <a href="/" data-link>Home</a>
+      <div class="vx-has"><a href="/catalog/" data-link>Shop <svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a><div class="vx-sub"><a href="/catalog/" data-link>All Products</a><a href="/category/health-and-beauty/" data-link>Health &amp; Beauty</a><a href="/category/home-and-kitchen/" data-link>Home &amp; Kitchen</a><a href="/category/watches/" data-link>Watches</a><a href="/category/fragrance/" data-link>Fragrance</a><a href="/category/electronics/" data-link>Electronics</a></div></div>
+      <div class="vx-has"><a href="/catalog/?q=men" data-link>Men <svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a><div class="vx-sub"><a href="/catalog/?q=men" data-link>All Men</a><a href="/catalog/?q=shirt" data-link>Shirts</a><a href="/catalog/?q=jacket" data-link>Jackets</a></div></div>
+      <div class="vx-has"><a href="/catalog/?q=women" data-link>Women <svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a><div class="vx-sub"><a href="/catalog/?q=women" data-link>All Women</a><a href="/catalog/?q=dress" data-link>Dresses</a><a href="/catalog/?q=top" data-link>Tops</a></div></div>
+      <div class="vx-has"><a href="/catalog/" data-link>Collections <svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></a><div class="vx-sub"><a href="/catalog/?sort=newest" data-link>New Arrivals</a><a href="/catalog/?featured=1" data-link>Best Sellers</a><a href="/category/health-and-beauty/" data-link>Health &amp; Beauty</a><a href="/category/home-and-kitchen/" data-link>Home &amp; Kitchen</a><a href="/category/watches/" data-link>Watches</a><a href="/category/fragrance/" data-link>Fragrance</a><a href="/category/electronics/" data-link>Electronics</a></div></div>
+      <a href="/catalog/?sale=1" data-link>Offers</a>
+      <a href="/contact/" data-link>About Us</a>
+      <a href="/contact/" data-link>Contact Us</a>
     </nav>
+    <div class="vx-tools">
+      <button class="icon-btn" id="searchToggle" aria-label="Search"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+      <a href="/account/" class="vx-ic account-header-link" data-link aria-label="Account"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.7-3.6 3.4-5.4 7-5.4s6.3 1.8 7 5.4"/></svg></a>
+      <button class="icon-btn" id="wishToggle" aria-label="Wishlist"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z"/></svg><span class="badge" id="wishCount">0</span></button>
+      <button class="icon-btn" id="cartToggle" aria-label="Cart"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 12H6zM9 8V6.5a3 3 0 0 1 6 0V8"/></svg><span class="badge" id="cartCount">0</span></button>
+    </div>
+    <div class="search-bar" id="searchBar">
+      <select id="searchCatSelect" aria-label="Category"><option value="">All Categories</option><option value="health-and-beauty">Health &amp; Beauty</option><option value="home-and-kitchen">Home &amp; Kitchen</option><option value="watches">Watches</option><option value="fragrance">Fragrance</option><option value="electronics">Electronics</option></select>
+      <input type="text" id="searchInput" placeholder="Search products, brands and more…">
+      <button id="searchGo" aria-label="Search"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
+    </div>
   </div>
 </header>
 
 <!-- ============ APP ROOT ============ -->
 <main id="app"></main>
 
+<!-- ============ NEWSLETTER ============ -->
+<section class="vx-news"><div class="vx-wrap">
+  <div><h3>Join Our Fashion Community</h3><p>Get exclusive offers, early access to new collections and style inspiration.</p></div>
+  <form id="newsletterForm"><input type="email" placeholder="Enter your email address" required aria-label="Email address"><button type="submit">Subscribe &rarr;</button></form>
+  <p id="newsletterMsg"></p>
+</div></section>
+
 <!-- ============ FOOTER ============ -->
-<footer class="site-footer">
-  <div class="footer-grid">
-    <div class="footer-col footer-brand">
-      <div class="brand brand--footer"><span class="brand__mark"><svg width="30" height="30" viewBox="0 0 32 32"><path d="M2 5l9 7 5-4 5 4 9-7v22l-9-7-5 4-5-4-9 7z" fill="currentColor"/></svg></span><span class="brand__name">ZM HYBRID</span></div>
-      <p>A hybrid storefront for beauty, home and lifestyle essentials — curated drops, honest prices, fast delivery.</p>
-      <div class="social-row">
-        <a href="#" aria-label="Facebook">f</a><a href="#" aria-label="Instagram">◎</a><a href="#" aria-label="X">𝕏</a><a href="#" aria-label="Pinterest">P</a><a href="#" aria-label="YouTube">▶</a>
-      </div>
-    </div>
-    <div class="footer-col"><h4>Shop</h4>
-      <a href="/catalog/" data-link>All Categories</a><a href="/catalog/?sale=1" data-link>Top Deals</a><a href="/catalog/?sort=newest" data-link>New Arrivals</a><a href="/catalog/?featured=1" data-link>Best Sellers</a><a href="/catalog/?sale=1" data-link>Clearance Sale</a></div>
-    <div class="footer-col"><h4>Customer Service</h4>
-      <a href="/contact/" data-link>Help Center</a><a href="/track-order/" data-link>Track Order</a><a href="/policy/returns/" data-link>Returns &amp; Refunds</a><a href="/policy/shipping/" data-link>Shipping Info</a><a href="/contact/" data-link>Contact Us</a></div>
-    <div class="footer-col"><h4>About Us</h4>
-      <a href="/contact/" data-link>About Us</a><a href="/policy/faq/" data-link>FAQs</a><a href="/policy/privacy/" data-link>Privacy Policy</a><a href="/policy/terms/" data-link>Terms of Service</a><a href="/affiliate/">Affiliate Portal</a></div>
-    <div class="footer-col"><h4>Payments</h4>
-      <p class="footer-note">Cash on Delivery, Bank Transfer, JazzCash &amp; Easypaisa accepted.</p>
-      <div class="pay-badges"><span>COD</span><span>JazzCash</span><span>Easypaisa</span><span>Bank</span></div>
-    </div>
+<footer class="site-footer vx-foot">
+  <div class="vx-wrap">
+    <div class="footer-col footer-brand"><a href="/" class="vx-brand" data-link><b>ZM</b><small>HYBRID STORE</small></a><p>Modern fashion for modern lives. Premium quality. Timeless style. A better tomorrow.</p>
+      <div class="vx-soc"><a href="#" aria-label="Instagram"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.500" y="3.500" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a><a href="#" aria-label="Facebook"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8.500z"/></svg></a><a href="#" aria-label="Pinterest"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M11 8c-2 .5-3 3-1.500 4.500 1 1 2.500.5 2.500-.8M12 11l-2 8"/></svg></a><a href="#" aria-label="YouTube"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="4"/><path d="M10.500 9.500v5l4-2.500z"/></svg></a><a href="#" aria-label="TikTok"><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v10.500a3.500 3.500 0 1 1-3.500-3.500M14 4c.5 2.500 2 4 4.500 4.200"/></svg></a></div></div>
+    <div class="footer-col"><h4>Shop</h4><ul><li><a href="/catalog/?q=men" data-link>Men</a></li><li><a href="/catalog/?q=women" data-link>Women</a></li><li><a href="/catalog/?q=kids" data-link>Kids</a></li><li><a href="/catalog/?q=accessories" data-link>Accessories</a></li><li><a href="/catalog/?sort=newest" data-link>New Arrivals</a></li><li><a href="/catalog/?featured=1" data-link>Best Sellers</a></li></ul></div>
+    <div class="footer-col"><h4>Help &amp; Support</h4><ul><li><a href="/policy/faq/" data-link>FAQs</a></li><li><a href="/policy/shipping/" data-link>Shipping Policy</a></li><li><a href="/policy/returns/" data-link>Returns &amp; Refunds</a></li><li><a href="/policy/faq/" data-link>Size Guide</a></li><li><a href="/track/" data-link>Track Order</a></li><li><a href="/contact/" data-link>Contact Us</a></li></ul></div>
+    <div class="footer-col"><h4>About</h4><ul><li><a href="/contact/" data-link>Our Story</a></li><li><a href="/contact/" data-link>Sustainability</a></li><li><a href="/contact/" data-link>Careers</a></li><li><a href="/catalog/" data-link>Blog</a></li><li><a href="/contact/" data-link>Press</a></li><li><a href="/affiliate/" data-link>Affiliates</a></li></ul></div>
+    <div class="footer-col"><h4>Contact Us</h4><ul class="vx-ct"><li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21z"/><circle cx="12" cy="9.500" r="2.500"/></svg><span>123 Fashion Street,<br>Your City, Country</span></li><li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>+92 300 0000000</span></li><li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>hello@zmhybridstore.com</span></li><li><svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Mon - Sat: 9:00 AM - 7:00 PM</span></li></ul></div>
+    <div class="vx-sig">Fashion<br>A Kinder<br>Tomorrow <span>♡</span></div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2026 ZM Hybrid Store. All rights reserved.</span>
-    <span><a href="/policy/privacy/" data-link>Privacy Policy</a> &nbsp;|&nbsp; <a href="/policy/terms/" data-link>Terms of Service</a> &nbsp;|&nbsp; <a href="/policy/shipping/" data-link>Shipping</a></span>
-  </div>
+  <div class="vx-copy"><div class="vx-wrap"><span>© 2026 ZM Hybrid Store. All Rights Reserved.</span><span class="vx-pay">We Accept: <i>VISA</i><i class="mc"><s></s><s></s></i><i class="cod">COD</i><i class="jz">JazzCash</i></span></div></div>
 </footer>
 
 <!-- ============ FLOATING WHATSAPP BUTTON ============ -->
@@ -178,6 +146,6 @@
 <!-- ============ TOAST ============ -->
 <div class="toast" id="toast"></div>
 
-<script src="script.js?v=novella1"></script>
+<script src="script.js?v=velora-1"></script>
 </body>
 </html>

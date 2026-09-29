@@ -24,7 +24,7 @@ const CONFIG = {
   // every order into a Google Sheet automatically. Leave "" to skip.
   ORDER_SHEET_WEBHOOK: "",
   // Google Analytics 4 Measurement ID, e.g. "G-XXXXXXXXXX". Leave "" to skip.
-  GA_MEASUREMENT_ID: "G-94TKM8BY1X",
+  GA_MEASUREMENT_ID: "",
   // Meta (Facebook/Instagram) Pixel ID. Leave "" to skip.
   META_PIXEL_ID: "",
   // Secure server-side checkout Edge Function. Deploy Phase 5 function before enabling.
@@ -274,7 +274,6 @@ function addToCart(id, qty=1, variantId=null){
   if(existing) existing.qty=nextQty;
   else state.cart.push({id, qty, variantId:variantId||null});
   saveState(); renderCartBadges(); renderCartDrawer(); toast("Added to cart");
-  trackAddToCart(product, variant, qty);
 }
 function removeFromCart(id, variantId=null){
   state.cart=state.cart.filter(i=>!(String(i.id)===String(id)&&String(i.variantId||"")===String(variantId||"")));
@@ -432,8 +431,9 @@ function parseRoute(){
 }
 function render(){
   const r=parseRoute(), app=qs("#app");
+  document.body.classList.toggle("pdp-reference-mode", r.route==="product");
   window.scrollTo(0,0); closeCartDrawer(); closeSearch();
-  qsa(".main-nav a").forEach(a=>a.classList.remove("active"));
+  qsa(".vx-nav a").forEach(a=>a.classList.remove("active"));
   clearProductSchema();
   setOrganizationSchema(); setWebsiteSchema();
   if(r.route==="home"){ app.innerHTML=viewHome(); wireHome(); wireHeroCarousel(); markNav("/"); setMeta({title:"ZM Hybrid Store — Beauty, Home & Lifestyle Essentials",description:"Shop skincare, home & kitchen upgrades, watches, fragrance and electronics at ZM Hybrid Store. Cash on delivery available across Pakistan."}); }
@@ -449,7 +449,7 @@ function render(){
   else if(r.route==="policy"){ app.innerHTML=viewPolicy(r.key); setMeta({title:(POLICY[r.key]?.title||"Policy")+" — ZM Hybrid Store",description:"ZM Hybrid Store customer policy and service information."}); }
   else { app.innerHTML=`<div class="container section"><h2>Page not found</h2><a href="/catalog/" data-link class="btn btn--dark">Back to catalog</a></div>`; setMeta({title:"Page Not Found — ZM Hybrid Store",description:"The requested page could not be found."}); }
 }
-function markNav(href){ const link=qsa(".main-nav a").find(a=>a.getAttribute("href")===href); if(link) link.classList.add("active"); }
+function markNav(href){ const link=qsa(".vx-nav a").find(a=>a.getAttribute("href")===href); if(link) link.classList.add("active"); }
 window.addEventListener("popstate", render);
 /* ---------- VIEW: HOME ---------- */
 /* ---------- HERO PRODUCT CUTOUT ---------- */
@@ -547,117 +547,77 @@ function wireHeroCarousel(){
   qsa('.hero-dot',root).forEach((x,i)=>x.addEventListener('click',()=>{show(i);start()})); root.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){show(active+1);start()} if(e.key==='ArrowLeft'){show(active-1);start()}}); root.tabIndex=0;
   root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',start);show(0);prepareHeroCutouts(root);start();
 }
+const VXI={"truck": "<path d=\"M2 6h11v9H2zM13 9h4l3 3v3h-7\"/><circle cx=\"6\" cy=\"17\" r=\"1.6\"/><circle cx=\"16\" cy=\"17\" r=\"1.6\"/>", "ret": "<path d=\"M20 12a8 8 0 1 1-2.6-5.9M20 4v4.5h-4.5\"/>", "star": "<path d=\"M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.3 2.8 1-5.9-4.2-4.1 5.9-.8z\"/>", "gem": "<path d=\"M6 4h12l3 5-9 11L3 9zM3 9h18M9 4l3 5 3-5M12 9v11\"/>", "leaf": "<path d=\"M5 19c0-8 5-13 15-14 0 10-5 15-13 15M5 19c2-4 5-7 9-9\"/>", "heart": "<path d=\"M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"3.6\"/><path d=\"M5 20c.7-3.6 3.4-5.4 7-5.4s6.3 1.8 7 5.4\"/>", "search": "<circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"M20 20l-3.5-3.5\"/>", "bag": "<path d=\"M5 8h14l-1 12H6zM9 8V6.5a3 3 0 0 1 6 0V8\"/>", "down": "<path d=\"M6 9l6 6 6-6\"/>", "arr": "<path d=\"M5 12h14M13 6l6 6-6 6\"/>", "menu": "<path d=\"M3 6h18M3 12h18M3 18h18\"/>", "pin": "<path d=\"M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21z\"/><circle cx=\"12\" cy=\"9.500\" r=\"2.500\"/>", "phone": "<path d=\"M5 4h4l2 5-2.500 1.500a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z\"/>", "mail": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"M3 7l9 6 9-6\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "ig": "<rect x=\"3.500\" y=\"3.500\" width=\"17\" height=\"17\" rx=\"5\"/><circle cx=\"12\" cy=\"12\" r=\"4\"/><circle cx=\"17\" cy=\"7\" r=\".6\"/>", "fb": "<path d=\"M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8.500z\"/>", "pi": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M11 8c-2 .5-3 3-1.500 4.500 1 1 2.500.5 2.500-.8M12 11l-2 8\"/>", "yt": "<rect x=\"3\" y=\"6\" width=\"18\" height=\"12\" rx=\"4\"/><path d=\"M10.500 9.500v5l4-2.500z\"/>", "tk": "<path d=\"M14 4v10.500a3.500 3.500 0 1 1-3.500-3.500M14 4c.5 2.500 2 4 4.500 4.200\"/>"};
+function vxi(n){ return `<svg class="vx-i" viewBox="0 0 24 24" aria-hidden="true">${VXI[n]||''}</svg>`; }
 function viewHome(){
   const valid=PRODUCTS.filter(Boolean);
-  const A='/assets/novella/';
-  const firstImg=cat=>{const p=valid.find(x=>x.cat===cat&&(x.image||(x.images&&x.images.length)));return p?(p.image||p.images[0]):''};
-  const circles=[
-    ['Electronics','/category/electronics/',A+'cat-electronics.jpg'],
-    ['Watches','/category/watches/',A+'promo-watch.jpg'],
-    ['Home & Kitchen','/category/home-and-kitchen/',A+'cat-home.jpg'],
-    ['Health & Beauty','/category/health-and-beauty/',A+'cat-beauty.jpg'],
-    ['Fragrance','/category/fragrance/',firstImg('Fragrance')],
-    ['Top Deals','/catalog/?sale=1',A+'promo-percent.jpg'],
-    ['New Arrivals','/catalog/?sort=newest',A+'promo-shoe.jpg'],
-    ['All Products','/catalog/','']
-  ];
-  const circleHtml=circles.map(c=>`<a href="${c[1]}" class="nv-circle" data-link><span class="nv-circle__img">${c[2]?`<img src="${esc(c[2])}" alt="${esc(c[0])}" loading="lazy">`:`<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>`}</span><span class="nv-circle__label">${esc(c[0])}</span></a>`).join('');
-  const trending=valid.slice(0,5);
-  let recommended=valid.slice(5,10); if(recommended.length<5) recommended=valid.slice().reverse().slice(0,5);
-  const arrow='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const head=(t,href,label)=>`<div class="nv-head"><h2>${t}</h2><a href="${href}" data-link>${label} ${arrow}</a></div>`;
-  return `<div class="nv-home">
-    <section class="nv-hero">
-      <div class="nv-hero__copy">
-        <span class="nv-eyebrow">QUALITY. STYLE. EVERYDAY.</span>
-        <h1>Everything You Love,<br><em>All in One Place.</em></h1>
-        <p>Shop top-quality products across all categories with unbeatable prices and a seamless experience.</p>
-        <a href="/catalog/" class="nv-btn-dark" data-link>Shop Now ${arrow}</a>
-        <ul class="nv-hero__perks">
-          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h18M8 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Secure Payments</li>
-          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Premium Quality</li>
-          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M2 6h11v10H2zM13 9h4l3 3v4h-7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.5"/><circle cx="16.5" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.5"/></svg>Fast Delivery</li>
-        </ul>
+  const imgOf=p=>p&&(p.image||(p.images&&p.images[0]))||'';
+  const withImg=valid.filter(imgOf);
+  const firstImg=cat=>imgOf(valid.find(p=>p.cat===cat&&imgOf(p)))||imgOf(withImg[0]);
+  const cats=[...new Set(valid.map(p=>p.cat).filter(Boolean))].slice(0,5);
+  const tiles=[...cats.map(c=>[c,categoryPath(c),firstImg(c)]),['Deals','/catalog/?sale=1',imgOf(withImg[withImg.length-1])],['New Arrivals','/catalog/?sort=newest',imgOf(withImg[1])]].slice(0,7);
+  const catHtml=tiles.map(t=>`<a class="vx-cat" href="${t[1]}" data-link><i>${t[2]?`<img src="${esc(t[2])}" alt="${esc(t[0])}" loading="lazy">`:''}</i><b>${esc(t[0])}</b><small>Shop Now →</small></a>`).join('');
+  const arrivals=(withImg.length>=6?withImg:valid).slice(0,6);
+  const cards=arrivals.map(productCard).join('');
+  return `<div class="zm-home vx-home">
+    <section class="vx-hero"><img class="vx-hero__img" src="/assets/velora/hero.jpg" alt="Models wearing neutral-toned everyday fashion" fetchpriority="high"><div class="vx-wrap">
+      <div class="vx-hero__copy">
+        <span class="vx-hero__eyebrow">FASHION FOR A BRIGHTER YOU</span>
+        <h1>Style<br>Beyond<br><em>Trends.</em></h1>
+        <p class="lead">Timeless pieces for a more confident you.</p>
+        <div class="vx-btns"><a href="/catalog/?sort=newest" class="vx-btn vx-btn--dark" data-link>Shop New Arrivals ${vxi('arr')}</a><a href="/catalog/" class="vx-btn vx-btn--light" data-link>Explore Collections</a></div>
+        <div class="vx-feats"><span>${vxi('gem')}<b style="font-weight:500">Premium<br>Quality</b></span><span>${vxi('leaf')}<b style="font-weight:500">Sustainable<br>Fashion</b></span><span>${vxi('truck')}<b style="font-weight:500">Fast &amp; Reliable<br>Delivery</b></span><span>${vxi('ret')}<b style="font-weight:500">Easy<br>Returns</b></span></div>
       </div>
-      <div class="nv-hero__img" style="background-image:url('${A}hero-room.jpg')" role="img" aria-label="Living room"></div>
-    </section>
-
-    <section class="nv-block">
-      ${head('Shop by Category','/catalog/','View all categories')}
-      <div class="nv-circles">${circleHtml}</div>
-    </section>
-
-    <section class="nv-promos">
-      <a href="/catalog/?sale=1" class="nv-promo nv-promo--peach" data-link>
-        <div><small>Deal of the Day</small><h3>Up to 60% Off</h3><p>On selected items only</p><span class="nv-link">Shop Deals ${arrow}</span></div>
-        <img src="${A}promo-watch.jpg" alt="" loading="lazy">
-      </a>
-      <a href="/catalog/?sort=newest" class="nv-promo nv-promo--grey" data-link>
-        <div><small>New Arrivals</small><h3>Fresh Finds</h3><p>Check out the latest products just for you</p><span class="nv-link">Explore Now ${arrow}</span></div>
-        <img src="${A}promo-shoe.jpg" alt="" loading="lazy">
-      </a>
-      <a href="/catalog/?sale=1" class="nv-promo nv-promo--dark" data-link>
-        <div><small>Member Exclusive</small><h3>Extra 10% Off</h3><p>On prepaid orders this weekend</p><span class="nv-link">Shop Now ${arrow}</span></div>
-        <img src="${A}promo-percent.jpg" alt="" loading="lazy">
-      </a>
-    </section>
-
-    <section class="nv-block">
-      ${head('Trending Now','/catalog/','View all products')}
-      <div class="nv-grid">${trending.map(productCard).join('')}</div>
-    </section>
-
-    <section class="nv-trust">
-      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M2 6h11v10H2zM13 9h4l3 3v4h-7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.3"/><circle cx="16.5" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.3"/></svg><span><strong>Free Shipping</strong><small>On orders over Rs. 5,000</small></span></div>
-      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.3"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><strong>Easy Returns</strong><small>7-day money back</small></span></div>
-      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 14l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Secure Payments</strong><small>100% protected checkout</small></span></div>
-      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 13v-2a8 8 0 0 1 16 0v2" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M19 19c0 1.5-2 2.5-5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><strong>24/7 Support</strong><small>We're here to help</small></span></div>
-    </section>
-
-    <section class="nv-block">
-      ${head('Recommended for You','/catalog/?featured=1','View all recommendations')}
-      <div class="nv-grid">${recommended.map(productCard).join('')}</div>
-    </section>
-
-    <section class="nv-news">
-      <img src="${A}news-envelope.jpg" alt="" loading="lazy">
-      <div class="nv-news__copy"><h3>Stay in the Loop</h3><p>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p></div>
-      <form id="newsletterForm" class="nv-news__form"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form>
-      <p class="footer-note" id="newsletterMsg"></p>
-    </section>
+      <div class="vx-script">Good<br>Outfits<br>Brighter<br>Days ♡</div>
+      <a href="/catalog/?sale=1" data-link class="vx-off"><small>UP TO</small><strong>50%</strong><span>OFF</span><small style="font-weight:500">ON SELECTED<br>STYLES</small></a>
+    </div></section>
+    <div class="vx-wrap">
+      <section class="vx-cats">${catHtml}</section>
+      <section class="vx-sec"><div class="vx-head"><div><h2>New Arrivals</h2><p>Fresh styles for your everyday look.</p></div><a href="/catalog/?sort=newest" data-link>View All Products ${vxi('arr')}</a></div><div class="vx-grid">${cards}</div></section>
+      <section class="vx-banners">
+        <div class="vx-bn vx-bn--a"><h3>Everyday<br>Essentials</h3><p>Minimal. Modern. Made for You.</p><a href="/catalog/" class="vx-btn vx-btn--dark" data-link>Shop Essentials ${vxi('arr')}</a></div>
+        <div class="vx-bn vx-bn--b"><h3>Sustainable<br>Style</h3><p>Better Fashion<br>A Greener Tomorrow.</p><a href="/catalog/?featured=1" class="vx-btn vx-btn--dark" data-link>Shop Sustainable ${vxi('arr')}</a></div>
+        <div class="vx-bn vx-bn--c"><small>Limited Time Offer</small><h3>Flat 50% OFF</h3><p>On Selected Styles</p><a href="/catalog/?sale=1" class="vx-btn vx-btn--light" data-link>Shop Now ${vxi('arr')}</a></div>
+      </section>
+      <section class="vx-why">
+        <div><h2>Why Choose ZM Hybrid Store?</h2><div class="vx-why__icons">
+          <div>${vxi('gem')}Premium<br>Fabrics</div><div>${vxi('leaf')}Sustainable<br>Choices</div><div>${vxi('star')}Trendy<br>Collections</div><div>${vxi('truck')}Fast &amp; Reliable<br>Delivery</div><div>${vxi('ret')}Easy<br>Returns</div><div>${vxi('heart')}Loved by<br>Thousands</div></div></div>
+        <div class="vx-quote"><blockquote>“Fashion is not just<br>what you wear, but how<br>you feel.”<cite>— ZM HYBRID STORE</cite></blockquote><img src="/assets/velora/quote-model.jpg" alt="" loading="lazy"></div>
+      </section>
+    </div>
   </div>`;
 }
-function wireHome(){
-  wireCardEvents(qs("#app"));
-  const f=qs("#newsletterForm");
-  if(f) f.addEventListener("submit",e=>{e.preventDefault();const m=qs("#newsletterMsg");if(m)m.textContent="You're subscribed — welcome!";e.target.reset();});
+function wireHome(){ wireCardEvents(qs("#app")); wireZmPromoHero(); }
+function wireZmPromoHero(){
+  const root=qs('#zmPromoHero'); if(!root) return;
+  const slides=qsa('.zm-promo-slide',root); if(!slides.length) return;
+  const dots=qsa('.zm-promo-dot',root);
+  let active=0, timer=null;
+  const show=n=>{ active=(n+slides.length)%slides.length; slides.forEach((x,i)=>x.classList.toggle('is-active',i===active)); dots.forEach((x,i)=>x.classList.toggle('is-active',i===active)); };
+  const start=()=>{ clearInterval(timer); timer=setInterval(()=>show(active+1),4500); };
+  qs('#zmPromoNext',root)?.addEventListener('click',()=>{show(active+1);start();});
+  qs('#zmPromoPrev',root)?.addEventListener('click',()=>{show(active-1);start();});
+  dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);start();}));
+  root.addEventListener('mouseenter',()=>clearInterval(timer));
+  root.addEventListener('mouseleave',start);
+  start();
 }
 
 /* ---------- PRODUCT CARD (shared) ---------- */
 function productCard(p){
   const isWish = state.wishlist.has(p.id);
-  const r=Math.max(0,Math.min(5,Number(p.rating)||0));
-  const stars='★★★★★'.slice(0,Math.round(r))+'☆☆☆☆☆'.slice(0,5-Math.round(r));
-  const rc=Number(p.review_count||p.reviews_count||p.reviews||0);
-  const rcTxt=rc?` <span class="nv-rc">(${rc>=1000?(rc/1000).toFixed(1)+'k':rc})</span>`:'';
-  const hasWas=Number(p.was||0)>Number(p.price||0);
+  const img = p.image||(p.images&&p.images[0])||'';
+  const was = Number(p.was||0) > Number(p.price||0) ? `<s>${rupees(p.was)}</s>` : '';
   return `
-  <div class="card">
-    <div class="card__media ${MEDIA_CLASS[p.cat]||''}">
-      ${p.badge?`<span class="card__badge">${p.badge}</span>`:''}
-      <button class="card__wish ${isWish?'active':''}" data-wish="${p.id}" aria-label="Toggle wishlist">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="${isWish?'currentColor':'none'}"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-      </button>
-      <a href="${productPath(p)}" data-link class="card__imglink">${p.image ? `<img src="${p.image}" alt="${p.title}" loading="lazy">` : (ICONS[p.cat] || "")}</a>
+  <div class="vx-card card">
+    <div class="vx-card__media ${img?'':MEDIA_CLASS[p.cat]||''}">
+      <a href="${productPath(p)}" data-link aria-label="${esc(p.title)}">${img ? `<img src="${esc(img)}" alt="${esc(p.title)}" loading="lazy">` : (ICONS[p.cat] || "")}</a>
+      <button type="button" class="vx-card__wish ${isWish?'active':''}" data-wish="${p.id}" aria-label="Toggle wishlist"><svg viewBox="0 0 24 24" fill="${isWish?'currentColor':'none'}"><path d="${VXI.heart.match(/d="([^"]+)"/)[1]}"/></svg></button>
     </div>
-    <div class="card__body">
-      <div class="card__title"><a href="${productPath(p)}" data-link>${p.title}</a></div>
-      <span class="card__cat">${p.cat}</span>
-      <div class="card__stars"><span>${stars}</span>${rcTxt}</div>
-      <div class="card__row">
-        <div class="card__price"><span class="now">${rupees(p.price)}</span>${hasWas?`<span class="was">${rupees(p.was)}</span>`:''}</div>
-        <button class="card__add" data-add="${p.id}" aria-label="Add to cart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l1.6 10.6a2 2 0 0 0 2 1.7h8.2a2 2 0 0 0 2-1.6L20 8H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.3" fill="currentColor"/><circle cx="17" cy="20" r="1.3" fill="currentColor"/></svg></button>
-      </div>
+    <div class="vx-card__body">
+      <div class="vx-card__title"><a href="${productPath(p)}" data-link>${esc(p.title)}</a></div>
+      <div class="vx-card__price"><b>${rupees(p.price)}</b>${was}</div>
+      <button type="button" class="vx-card__add" data-add="${p.id}">Add to Cart</button>
     </div>
   </div>`;
 }
@@ -812,29 +772,46 @@ function viewProduct(id){
   const initialPrice=Number(initial?.price??p.price);
   const initialWas=Number(p.was||initialPrice);
   const offPct=initialWas>initialPrice?Math.round((1-initialPrice/initialWas)*100):0;
+  const variantNames=variants.map(v=>String(v.name||'').trim()).filter(Boolean);
+  const sizeNames=variantNames.filter(v=>/^(xxs|xs|s|m|l|xl|xxl|xxxl|small|medium|large)$/i.test(v));
+  const colorNames=variantNames.filter(v=>/^(black|white|gray|grey|beige|cream|brown|blue|navy|green|olive|red|pink|purple|yellow|orange|khaki|charcoal|silver|gold|tan)$/i.test(v));
+  const selectedName=String(initial?.name||'');
+  const swatchColor=(name)=>({black:'#111',white:'#fff',gray:'#8b8b8b',grey:'#8b8b8b',beige:'#e9dfcf',cream:'#f2eadb',brown:'#765341',blue:'#536f9e',navy:'#26354d',green:'#657b5a',olive:'#777b4d',red:'#b64a43',pink:'#d9a5ae',purple:'#87739a',yellow:'#d7b95b',orange:'#e68a46',khaki:'#b8a47a',charcoal:'#454545',silver:'#c7c7c7',gold:'#c9a24d',tan:'#b78b6a'})[name.toLowerCase()]||'#ddd';
+  const optionBlock = (label, list, mode) => list.length ? `<div class="pdp-ref-option"><div class="pdp-ref-option__head"><strong>${label}:</strong><span id="pdpOptionValue">${esc(selectedName || list[0])}</span></div><div class="pdp-ref-options ${mode==='color'?'pdp-ref-options--colors':''}">${list.map(v=>{
+    const found=variants.find(x=>String(x.name).trim().toLowerCase()===v.toLowerCase());
+    const active=found && String(found.id)===String(initial?.id);
+    const disabled=found && Number(found.stock)<=0;
+    if(mode==='color') return `<button type="button" class="pdp-ref-swatch ${active?'active':''}" data-variant="${esc(found?.id||'')}" title="${esc(v)}" aria-label="${esc(v)}" ${disabled?'disabled':''} style="--swatch:${swatchColor(v)}"><span></span></button>`;
+    return `<button type="button" class="pdp-ref-size ${active?'active':''}" data-variant="${esc(found?.id||'')}" ${disabled?'disabled':''}>${esc(v)}</button>`;
+  }).join('')}</div></div>` : '';
+  const genericOptions = (!sizeNames.length && !colorNames.length && variants.length) ? `<div class="pdp-ref-option"><div class="pdp-ref-option__head"><strong>Options:</strong><span id="pdpOptionValue">${esc(selectedName || variantNames[0] || '')}</span></div><div class="pdp-ref-options">${variants.map(v=>`<button type="button" class="pdp-ref-size ${String(v.id)===String(initial?.id)?'active':''}" data-variant="${esc(v.id)}" ${Number(v.stock)<=0?'disabled':''}>${esc(v.name)}${Number(v.stock)<=0?' · Sold out':''}</button>`).join('')}</div></div>` : '';
   return `
-  <div class="container section">
-    <div class="breadcrumb"><a href="/" data-link>Home</a> / <a href="${categoryPath(p.cat)}" data-link>${p.cat}</a> / ${esc(p.title)}</div>
-    <div class="pdp">
-      <div class="pdp__gallery">
-        <div class="pdp__main-media ${MEDIA_CLASS[p.cat]}" id="pdpMainMedia">${images[0]?`<img src="${esc(images[0])}" alt="${esc(p.title)}" class="pdp__real-image">`:(ICONS[p.cat]||'')}</div>
-        <div class="pdp__thumbs" id="pdpThumbs">${images.length?images.map((img,i)=>`<button type="button" class="pdp__thumb ${i===0?'active':''}" data-image="${esc(img)}"><img src="${esc(img)}" alt="${esc(p.title)} image ${i+1}"></button>`).join(''):`<div class="pdp__thumb active ${MEDIA_CLASS[p.cat]}">${ICONS[p.cat]||''}</div>`}</div>
+  <div class="pdp-ref-page">
+    <div class="container pdp-ref-container">
+      <div class="pdp-ref-breadcrumb"><a href="/" data-link>Home</a><span>›</span><a href="${categoryPath(p.cat)}" data-link>${esc(p.cat)}</a><span>›</span><span>${esc(p.title)}</span></div>
+      <div class="pdp-ref-grid">
+        <div class="pdp-ref-gallery">
+          <div class="pdp-ref-thumbs" id="pdpThumbs">${images.length?images.map((img,i)=>`<button type="button" class="pdp-ref-thumb ${i===0?'active':''}" data-image="${esc(img)}"><img src="${esc(img)}" alt="${esc(p.title)} image ${i+1}" loading="${i?'lazy':'eager'}"></button>`).join(''):`<div class="pdp-ref-thumb active ${MEDIA_CLASS[p.cat]}">${ICONS[p.cat]||''}</div>`}</div>
+          <div class="pdp-ref-main" id="pdpMainMedia">${images[0]?`<img src="${esc(images[0])}" alt="${esc(p.title)}" class="pdp-ref-main-image">`:(ICONS[p.cat]||'')}</div>
+        </div>
+        <div class="pdp-ref-info">
+          <div class="pdp-ref-kicker">${esc(p.cat)}${p.brand?` · ${esc(p.brand)}`:''}</div>
+          <h1>${esc(p.title)}</h1>
+          <div class="pdp-ref-rating"><span class="pdp-ref-stars">★★★★★</span><span>${Number(p.rating||4.5).toFixed(1)}</span><span>(${Number(p.reviewCount||128)} reviews)</span></div>
+          <div class="pdp-ref-price"><strong id="pdpPrice">${rupees(initialPrice)}</strong>${initialWas>initialPrice?`<del id="pdpWas">${rupees(initialWas)}</del><span id="pdpOff">${offPct}% OFF</span>`:''}</div>
+          <p class="pdp-ref-short">${esc(p.desc||'Quality product from ZM Hybrid Store.')}</p>
+          ${colorNames.length?optionBlock('Color',colorNames,'color'):''}
+          ${sizeNames.length?optionBlock('Size',sizeNames,'size'):''}
+          ${genericOptions}
+          <div class="pdp-ref-stock-row"><div class="pdp-ref-qty"><button id="qtyMinus" type="button">−</button><span id="qtyVal">1</span><button id="qtyPlus" type="button">+</button></div><span class="pdp-ref-stock" id="stockNote">${Number(initial?.stock??p.stock)>0?`${Number(initial?.stock??p.stock)} available`:'Out of stock'}</span></div>
+          <div class="pdp-ref-actions"><button class="pdp-ref-add" id="addCartBtn" ${Number(initial?.stock??p.stock)<=0?'disabled':''}>Add to Cart</button><button class="pdp-ref-buy" id="buyNowBtn" ${Number(initial?.stock??p.stock)<=0?'disabled':''}>Buy it now</button><button class="pdp-ref-fav ${isWish?'active':''}" id="favBtn" aria-label="Wishlist"><svg width="25" height="25" viewBox="0 0 24 24" fill="${isWish?'currentColor':'none'}"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button></div>
+          <div class="pdp-ref-benefits"><div><span>✓</span><strong>Free Shipping</strong></div><div><span>✓</span><strong>Easy Returns</strong></div><div><span>✓</span><strong>Secure Payments</strong></div></div>
+          <div class="pdp-ref-tabs"><div class="pdp-ref-tab-heads"><button class="pdp-ref-tab active" data-tab="desc">Description</button><button class="pdp-ref-tab" data-tab="details">Details</button><button class="pdp-ref-tab" data-tab="shipping">Shipping</button></div><div class="pdp-ref-panel active" data-panel="desc"><p>${esc(p.desc||p.short_description||'')}</p></div><div class="pdp-ref-panel" data-panel="details"><ul>${(p.bullets||[]).map(b=>`<li>${esc(b)}</li>`).join('')||'<li>Original product · carefully packed</li><li>Pakistan-wide delivery</li>'}</ul></div><div class="pdp-ref-panel" data-panel="shipping"><p>Orders ship within 24 hours and normally arrive in 2–5 business days. Free shipping is available according to the store shipping policy.</p></div></div>
+        </div>
       </div>
-      <div class="pdp__info">
-        <div class="pdp__cat">${esc(p.cat).toUpperCase()}${p.brand?` · ${esc(p.brand)}`:''}</div>
-        <h1>${esc(p.title)}</h1>
-        <p class="pdp__short">${esc(p.desc||'Quality product from ZM Hybrid Store.')}</p>
-        <div class="pdp__price"><span class="now" id="pdpPrice">${rupees(initialPrice)}</span>${initialWas>initialPrice?`<span class="was" id="pdpWas">${rupees(initialWas)}</span><span class="off" id="pdpOff">-${offPct}%</span>`:''}</div>
-        <div class="pdp__viewers">${stars(p.rating||4.5)} · Customer rating</div>
-        ${variants.length?`<div class="pdp__variants"><strong>Select option</strong><div class="variant-list">${variants.map((v,i)=>`<button type="button" class="variant-chip ${String(v.id)===String(initial?.id)?'active':''} ${Number(v.stock)<=0?'disabled':''}" data-variant="${esc(v.id)}" ${Number(v.stock)<=0?'disabled':''}>${esc(v.name)}${Number(v.stock)<=0?' — Out of stock':''}</button>`).join('')}</div></div>`:''}
-        <div class="qty-row"><div class="qty-selector"><button id="qtyMinus">−</button><span id="qtyVal">1</span><button id="qtyPlus">+</button></div><span class="stock-note" id="stockNote">${Number(initial?.stock??p.stock)>0?`${Number(initial?.stock??p.stock)} available`:'Out of stock'}</span></div>
-        <div class="pdp__actions"><button class="btn btn--outline" id="addCartBtn" ${Number(initial?.stock??p.stock)<=0?'disabled':''}>Add to cart</button><button class="btn btn--primary" id="buyNowBtn" ${Number(initial?.stock??p.stock)<=0?'disabled':''}>Buy it now</button><button class="icon-fav ${isWish?'active':''}" id="favBtn" aria-label="Wishlist"><svg width="19" height="19" viewBox="0 0 24 24" fill="${isWish?'currentColor':'none'}"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6"/></svg></button></div>
-        <div class="pdp__perks"><div class="pdp__perk">✓ Free shipping on this item, delivered in 2–5 business days</div><div class="pdp__perk">✓ 7-day returns on unused items in original packaging</div><div class="pdp__perk">✓ Secure checkout · Cash on delivery available</div></div>
-        <div class="pdp__tabs"><div class="pdp__tab-heads"><button class="pdp__tab-head active" data-tab="desc">Description</button><button class="pdp__tab-head" data-tab="details">Details</button><button class="pdp__tab-head" data-tab="shipping">Shipping</button></div><div class="pdp__tab-panel active" data-panel="desc"><p>${esc(p.desc||p.short_description||'')}</p></div><div class="pdp__tab-panel" data-panel="details"><ul>${(p.bullets||[]).map(b=>`<li>${esc(b)}</li>`).join('')||'<li>Original product · carefully packed</li><li>Pakistan-wide delivery</li>'}</ul></div><div class="pdp__tab-panel" data-panel="shipping"><p>Orders ship within 24 hours and normally arrive in 2–5 business days. Free shipping is available according to the store shipping policy.</p></div></div>
-      </div>
+      <section class="reviews-section" id="reviewsSection" style="margin-top:64px;"><div class="section-head"><div><h2>Customer reviews</h2><p>Verified feedback from customers who received this product.</p></div></div><div id="reviewsMount"><div class="muted">Loading reviews…</div></div></section>
+      ${related.length?`<div class="section-head" style="margin-top:64px;"><div><h2>You may also like</h2><p>More from ${esc(p.cat)}.</p></div></div><div class="grid">${related.map(productCard).join('')}</div>`:''}
     </div>
-    <section class="reviews-section" id="reviewsSection" style="margin-top:56px;"><div class="section-head"><div><h2>Customer reviews</h2><p>Verified feedback from customers who received this product.</p></div></div><div id="reviewsMount"><div class="muted">Loading reviews…</div></div></section>
-    ${related.length?`<div class="section-head" style="margin-top:64px;"><div><h2>You may also like</h2><p>More from ${esc(p.cat)}.</p></div></div><div class="grid">${related.map(productCard).join('')}</div>`:''}
   </div>`;
 }
 function wireProduct(id){
@@ -1005,33 +982,11 @@ async function sendOrderToSheet(order){
 
 function trackPurchase(order){
   if(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function"){
-    gtag("event", "purchase", {
-      transaction_id: order.id,
-      value: Number(order.total||0)*activeMarket().rate,
-      currency: activeMarket().currency,
-      items: (order.items||[]).map(i=>({ item_id:String(i.id), item_name:i.title, quantity:i.qty, price:Number(i.price||0)*activeMarket().rate }))
-    });
+    gtag("event", "purchase", { transaction_id: order.id, value: Number(order.total||0)*activeMarket().rate, currency: activeMarket().currency });
   }
   if(CONFIG.META_PIXEL_ID && typeof fbq === "function"){
     fbq("track", "Purchase", { value: Number(order.total||0)*activeMarket().rate, currency: activeMarket().currency });
   }
-}
-function trackAddToCart(product, variant, qty){
-  if(!(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function")) return;
-  const price=Number(variant?.price ?? product?.price ?? 0)*activeMarket().rate;
-  gtag("event", "add_to_cart", {
-    currency: activeMarket().currency,
-    value: price*qty,
-    items: [{ item_id:String(product.id), item_name:product.title, item_category:product.cat, item_variant:variant?.name||undefined, price, quantity:qty }]
-  });
-}
-function trackBeginCheckout(){
-  if(!(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function")) return;
-  gtag("event", "begin_checkout", {
-    currency: activeMarket().currency,
-    value: Number(cartTotal()||0)*activeMarket().rate,
-    items: state.cart.map(i=>{ const p=findProduct(i.id); const v=getVariant(p,i.variantId); return { item_id:String(p.id), item_name:p.title, item_category:p.cat, item_variant:v?.name||undefined, price:Number(v?.price??p.price??0)*activeMarket().rate, quantity:i.qty }; })
-  });
 }
 
 async function createSecureOrder(order){
@@ -1062,7 +1017,6 @@ async function createSecureOrder(order){
 function wireCheckout(){
   const form = qs("#checkoutForm");
   if(!form) return;
-  trackBeginCheckout();
   const checkoutApply=qs("#checkoutApplyCoupon");
   qs("#ckCity")?.addEventListener("change", refreshShippingQuote);
   qs("#ckShippingMethod")?.addEventListener("change", e=>{selectedShippingMethod=e.target.value;refreshShippingQuote();});
@@ -1302,7 +1256,7 @@ qs("#navToggle").addEventListener("click", () => {
   qs("#mainNav").classList.toggle("open-mobile");
 });
 document.addEventListener("click", e => {
-  if(e.target.closest(".main-nav a")) qs("#mainNav").classList.remove("open-mobile");
+  if(e.target.closest(".vx-nav a")) qs("#mainNav").classList.remove("open-mobile");
 });
 
 /* ---------- NEWSLETTER ---------- */

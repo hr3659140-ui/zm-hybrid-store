@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Site check</title>
+<style>body{font:16px/1.5 system-ui,Arial,sans-serif;max-width:640px;margin:30px auto;padding:0 16px;color:#222}h1{font-size:22px}li{margin:8px 0;list-style:none;padding:10px 12px;border-radius:8px;background:#f2f2f2}.ok{background:#e3f6e5}.bad{background:#fde3e3}ul{padding:0}small{color:#666}</style></head><body>
+<h1>ZM Hybrid Store — quick check</h1><p><small>Open this page at /check.html and send me a screenshot.</small></p><ul id="r"></ul>
+<script>
+const r=document.getElementById('r');
+function add(t,ok,d){const li=document.createElement('li');li.className=ok?'ok':'bad';li.textContent=(ok?'✅ ':'❌ ')+t+(d?' — '+d:'');r.appendChild(li)}
+async function f(url,opt){try{const x=await fetch(url,opt);return x}catch(e){return {ok:false,status:'blocked/offline',headers:{get:()=>''}}}}
+(async()=>{
+ add('Browser zoom / size',true,Math.round(window.devicePixelRatio*100)+'% pixel ratio, '+innerWidth+'px wide');
+ for(const u of ['/admin/','/admin/admin.css','/admin/admin.js','/affiliate/','/affiliate/affiliate.css','/affiliate/affiliate.js','/style.css','/script.js','/vendor/supabase.js']){
+  const x=await f(u,{cache:'no-store'});const ct=x.headers.get('content-type')||'';
+  const exp=u.endsWith('.css')?'css':u.endsWith('.js')?'javascript':'html';
+  add(u,x.ok&&ct.includes(exp),'status '+x.status+', type '+(ct||'?'));
+ }
+ const s=await f('https://iqgoclijgicgzncrjqqt.supabase.co/auth/v1/health',{headers:{apikey:'sb_publishable_pmKqaLISXQHNJD7GidkErw_etZeZ1KU'}});
+ add('Supabase reachable',s.ok||s.status===401,'status '+s.status);
+})();
+</script></body></html>

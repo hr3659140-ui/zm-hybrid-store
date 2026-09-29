@@ -16,3 +16,7 @@ Deploy: upload this whole folder to Cloudflare Pages as before.
 - Footer "Track Order" pointed to /track/ (404). Now /track-order/.
 - Admin (/admin/) and Affiliate (/affiliate/) code is unchanged from your original and tested: all 19 admin tabs and the affiliate login / link generation work with a mocked Supabase.
 - If login still fails, the cause is on the Supabase side (see checklist in chat): admin role in `profiles`, SQL phases run, email confirmation.
+
+## V12.2
+- supabase-js is now bundled locally (/vendor/supabase.js) instead of loading from cdn.jsdelivr.net (blocked on some networks/ISPs). Used by the store and the affiliate portal.
+- New /check.html: opens a plain page that tests CSS/JS files and Supabase reachability.

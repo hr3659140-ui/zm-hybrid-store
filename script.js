@@ -19,7 +19,7 @@ window.esc = esc;
    ============================================================ */
 const CONFIG = {
   // WhatsApp number in international format, digits only, no + or spaces
-  WHATSAPP_NUMBER: "923073659140",
+  WHATSAPP_NUMBER: "923000000000",
   // Paste your Google Apps Script Web App URL here (see setup guide) to log
   // every order into a Google Sheet automatically. Leave "" to skip.
   ORDER_SHEET_WEBHOOK: "",
@@ -38,7 +38,7 @@ const SUPABASE_CONFIG = {
 };
 let supabaseClient = null;
 let appliedCoupon = null;
-let STORE_CMS = { announcement_bar:"🔥 Sale Is Live! Up To 50% Off — 🚚 Fast Nationwide Delivery — COD Available", whatsapp_number:CONFIG.WHATSAPP_NUMBER, hero_eyebrow:"SALE IS LIVE — UP TO 50% OFF", hero_button_text:"Shop the sale", hero_title:"Beauty and home essentials, done right.", hero_description:"Curated beauty, home, kitchen, watches and electronics — selected for value and delivered across Pakistan.", footer_description:"Pakistan-wide online shopping for beauty, home, kitchen, watches and everyday essentials." };
+let STORE_CMS = { announcement_bar:"🔥 Sale Is Live! Up To 50% Off — 🚚 Free Shipping On All Orders", whatsapp_number:CONFIG.WHATSAPP_NUMBER, hero_eyebrow:"SALE IS LIVE — UP TO 50% OFF", hero_button_text:"Shop the sale", hero_title:"Beauty and home essentials, done right.", hero_description:"Curated skincare, kitchen upgrades, watches and fragrance — vetted for quality, priced fairly, delivered fast across the country.", footer_description:"A hybrid storefront for beauty, home and lifestyle essentials — curated drops, honest prices, fast delivery." };
 let SEO_CONFIG = {title:"ZM Hybrid Store — Beauty, Home & Lifestyle Essentials",description:"Shop quality beauty, home & kitchen, watches, fragrance and electronics at ZM Hybrid Store. Cash on delivery available across Pakistan.",keywords:"ZM Hybrid Store, online shopping Pakistan, beauty, home kitchen, watches, fragrance, electronics",canonical:"https://zm-hybrid-store.pages.dev/",og_image:"https://zm-hybrid-store.pages.dev/og-image.svg",twitter_card:"summary_large_image",google_verification:"",bing_verification:"",org_description:"ZM Hybrid Store is a Pakistan-wide online store for curated beauty, home, lifestyle and everyday essentials."};
 let HOME_BANNERS = [];
 let HERO_CMS = [];
@@ -548,70 +548,72 @@ function wireHeroCarousel(){
   root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',start);show(0);prepareHeroCutouts(root);start();
 }
 function viewHome(){
-  const cats=['Health & Beauty','Home & Kitchen','Watches','Fragrance','Electronics'];
   const valid=PRODUCTS.filter(Boolean);
-  const withImages=valid.filter(p=>p.image||(p.images&&p.images.length));
-  const heroPool=withImages.slice(0,3);
-  const featured=valid.slice(0,8);
-  const arrivals=valid.slice(8,16);
-  const dealItems=valid.filter(p=>Number(p.was||0)>Number(p.price||0)).slice(0,5);
-  const deals=dealItems.length?dealItems:featured.slice(0,5);
-  const brands=[...new Set(valid.map(p=>p.brand).filter(Boolean))].slice(0,7);
-  const catMeta=[
-    ['All Products','Browse everything','/catalog/'],
+  const byCat=(cat)=>valid.filter(p=>p.cat===cat && (p.image || (p.images&&p.images.length)))[0] || valid.find(p=>p.cat===cat) || {};
+  const cats=[
     ['Health & Beauty','Beauty essentials','/category/health-and-beauty/'],
-    ['Electronics','Smart picks','/category/electronics/'],
     ['Home & Kitchen','Everyday upgrades','/category/home-and-kitchen/'],
     ['Watches','Timeless pieces','/category/watches/'],
     ['Fragrance','Signature scents','/category/fragrance/'],
-    ['Deals','Limited offers','/catalog/?sale=1'],
-    ['New Arrivals','Fresh drops','/catalog/?sort=newest']
+    ['Electronics','Smart picks','/category/electronics/'],
+    ['Fashion','Everyday style','/catalog/'],
+    ['Baby & Kids','Family picks','/catalog/'],
+    ['Home Essentials','Comfort & living','/category/home-and-kitchen/']
   ];
-  const heroMain=heroPool[0]||valid[0]||{};
-  const heroImg=p=>p?.image?`<img src="${esc(p.image)}" alt="${esc(p.title||'Featured product')}" loading="lazy">`:'';
-  const heroTiles=heroPool.map((p,i)=>`<a href="${productPath(p)}" class="zm-hero-float zm-hero-float-${i}" data-link>${heroImg(p)}<span>${esc(p.title||'Featured')}</span></a>`).join('');
-  const heroTitle=STORE_CMS.hero_title||'Upgrade Your Shopping';
-  const heroDesc=STORE_CMS.hero_description||'Discover trending beauty, home, lifestyle and everyday essentials. Premium picks, fair prices.';
-  const heroEyebrow=STORE_CMS.hero_eyebrow||'SPECIAL COLLECTION';
-  const heroCTA=STORE_CMS.hero_button_text||'Shop Now';
-  const catTiles=catMeta.map((c,i)=>`<a href="${c[2]}" class="zm-cat-tile" data-link><span class="zm-cat-icon">${ICONS[c[0]]||ICONS[c[0].replace(' & Beauty','') ]||'✦'}</span><strong>${esc(c[0])}</strong><small>${esc(c[1])}</small></a>`).join('');
-  const dealCards=deals.map(productCard).join('');
-  const arrivalCards=arrivals.map(productCard).join('');
-  const promoScripts=['Super','Big','Mega','Weekend','Flash'];
-  const promoSlideData=cats.map((c,i)=>{
-    const cp=valid.find(p=>p.cat===c && (p.image||(p.images&&p.images.length))) || valid.find(p=>p.cat===c) || {};
-    const img=cp.image||(cp.images&&cp.images[0])||'';
-    return {cat:c, product:cp, img, script:promoScripts[i%promoScripts.length]};
-  });
-  const promoSlides=promoSlideData.map((s,i)=>`
-    <div class="zm-promo-slide zm-promo-slide--${i%5} ${i===0?'is-active':''}">
-      <div class="zm-promo-copy">
-        <span class="zm-promo-script">${esc(s.script)} SALE</span>
-        <h2 class="zm-promo-title">${esc(s.cat)}</h2>
-        <span class="zm-promo-sub">This weekend only</span>
-        <a href="${s.product&&s.product.id?productPath(s.product):categoryPath(s.cat)}" class="zm-promo-cta" data-link>Order Now →</a>
+  const discounted=valid.filter(p=>Number(p.was||0)>Number(p.price||0));
+  const deals=(discounted.length?discounted:valid).slice(0,6);
+  const recommendations=valid.slice(6,11).length?valid.slice(6,11):valid.slice(0,5);
+  const categoryTiles=cats.map(([name,sub,url])=>{
+    const p=byCat(name); const img=p.image||(p.images&&p.images[0]);
+    return `<a href="${url}" class="nov-cat" data-link>${img?`<span class="nov-cat__img"><img src="${esc(img)}" alt="${esc(name)}" loading="lazy"></span>`:`<span class="nov-cat__img nov-cat__img--icon">${ICONS[name]||'✦'}</span>`}<strong>${esc(name)}</strong><small>${esc(sub)}</small></a>`;
+  }).join('');
+  const productRail=(items)=>items.map(novellaProductCard).join('');
+  const deal1=byCat('Watches'), deal2=byCat('Electronics'), deal3=byCat('Health & Beauty');
+  const img=(p)=>p?.image||(p?.images&&p.images[0])||'';
+  return `<div class="nov-home">
+    <section class="nov-hero">
+      <div class="nov-hero__copy">
+        <div class="nov-eyebrow">PREMIUM QUALITY <span>•</span> BEST PRICES <span>•</span> FAST DELIVERY</div>
+        <h1>Beauty and home essentials,<br><em>done right.</em></h1>
+        <p>Discover premium skincare, kitchen upgrades, watches, fragrance and more. Quality products, fair pricing, and fast delivery — all in one place.</p>
+        <div class="nov-hero__actions"><a class="nov-btn nov-btn--dark" href="/catalog/?sale=1" data-link>Shop the sale <span>→</span></a><a class="nov-btn nov-btn--outline" href="/category/health-and-beauty/" data-link>Explore beauty</a></div>
+        <div class="nov-hero__perks"><span>▣ <b>Secure Payments</b></span><span>◉ <b>Premium Quality</b></span><span>▱ <b>Fast Delivery</b></span></div>
       </div>
-      <div class="zm-promo-visual">${s.img?`<img src="${esc(s.img)}" alt="${esc(s.cat)}" loading="lazy">`:`<div class="zm-promo-visual-icon">${ICONS[s.cat]||'✦'}</div>`}</div>
-      <div class="zm-promo-badge">Up to<br><strong>50%</strong><br>Off</div>
-    </div>`).join('');
-  const promoDots=promoSlideData.map((s,i)=>`<button class="zm-promo-dot ${i===0?'is-active':''}" data-i="${i}" aria-label="Slide ${i+1}"></button>`).join('');
-  return `<div class="zm-home">
-    <section class="zm-promo-hero" id="zmPromoHero">
-      <div class="zm-promo-track">
-        ${promoSlides}
-        <button class="zm-promo-arrow zm-promo-arrow--prev" id="zmPromoPrev" aria-label="Previous">‹</button>
-        <button class="zm-promo-arrow zm-promo-arrow--next" id="zmPromoNext" aria-label="Next">›</button>
-        <div class="zm-promo-dots">${promoDots}</div>
-      </div>
+      <div class="nov-hero__visual"><div class="nov-hero__wash"></div><img src="/zm-novella-hero.jpg" alt="Premium ZM Hybrid Store home collection"></div>
     </section>
-    <section class="zm-category-strip">${catTiles}</section>
-    <section class="zm-section"><div class="zm-section-head"><div><span class="zm-kicker">TODAY'S PICKS</span><h2>Featured Deals</h2><p>Hand-picked offers from across the store.</p></div><a href="/catalog/?sale=1" data-link>View All Deals →</a></div><div class="zm-products-grid">${dealCards}</div></section>
-    <section class="zm-brand-banner"><div><span>Big Savings On Top Categories</span><small>Limited-time offers • Fresh drops every week</small></div><a href="/catalog/?sale=1" class="btn btn--primary" data-link>Shop Now →</a><div class="zm-brand-list">${(brands.length?brands:['ZM BEAUTY','HOME','TECH','WATCHES','LIFESTYLE']).map(b=>`<b>${esc(b)}</b>`).join('')}</div></section>
-    <section class="zm-section"><div class="zm-section-head"><div><span class="zm-kicker">JUST LANDED</span><h2>New Arrivals</h2><p>Fresh products ready to discover.</p></div><a href="/catalog/?sort=newest" data-link>View All Products →</a></div><div class="zm-products-grid">${arrivalCards||dealCards}</div></section>
-    <section class="zm-trust-strip"><div><b>🚚</b><span><strong>Free Worldwide Shipping</strong><small>On selected orders</small></span></div><div><b>◷</b><span><strong>Easy 7-Day Returns</strong><small>Clear return policy</small></span></div><div><b>▣</b><span><strong>Secure &amp; Safe Payments</strong><small>Protected checkout</small></span></div><div><b>♡</b><span><strong>24/7 Customer Support</strong><small>We're here when needed</small></span></div></section>
+    <section class="nov-section nov-categories">
+      <div class="nov-section__head"><div><h2>Shop by Category</h2></div><a href="/catalog/" data-link>View all categories <span>→</span></a></div>
+      <div class="nov-cat-grid">${categoryTiles}</div>
+    </section>
+    <section class="nov-promos">
+      <a class="nov-promo nov-promo--cream" href="/catalog/?sale=1" data-link><div><small>Deal of the Day</small><strong>Up to 50% Off</strong><span>On selected items only</span><b>Shop Deals →</b></div>${img(deal1)?`<img src="${esc(img(deal1))}" alt="Deal of the Day">`:''}</a>
+      <a class="nov-promo nov-promo--mint" href="/catalog/?sort=newest" data-link><div><small>New Arrivals</small><strong>Fresh Finds</strong><span>Check out the latest<br>products just for you</span><b>Explore Now →</b></div>${img(deal2)?`<img src="${esc(img(deal2))}" alt="New arrivals">`:''}</a>
+      <a class="nov-promo nov-promo--black" href="/catalog/?sale=1" data-link><div><small>Member Exclusive</small><strong>Extra 10% Off</strong><span>On prepaid orders<br>this weekend</span><b>Shop Now →</b></div>${img(deal3)?`<img src="${esc(img(deal3))}" alt="Member exclusive">`:''}</a>
+    </section>
+    <section class="nov-section">
+      <div class="nov-section__head"><div><h2>Trending Now</h2></div><a href="/catalog/" data-link>View all products <span>→</span></a></div>
+      <div class="nov-products nov-products--six">${productRail(deals)}</div>
+    </section>
+    <section class="nov-benefits"><div><span class="nov-benefit-icon">♧</span><strong>Free Shipping</strong><small>On orders over $50</small></div><div><span class="nov-benefit-icon">↻</span><strong>Easy Returns</strong><small>7-day money back</small></div><div><span class="nov-benefit-icon">✓</span><strong>Secure Payments</strong><small>100% protected checkout</small></div><div><span class="nov-benefit-icon">◌</span><strong>24/7 Support</strong><small>We're here to help</small></div></section>
+    <section class="nov-section">
+      <div class="nov-section__head"><div><h2>Recommended for You</h2></div><a href="/catalog/?featured=1" data-link>View all recommendations <span>→</span></a></div>
+      <div class="nov-products nov-products--five">${productRail(recommendations)}</div>
+    </section>
+    <section class="nov-newsletter"><div class="nov-newsletter__art"><span>✉</span></div><div><h2>Stay in the Loop</h2><p>Subscribe to get special offers, free giveaways,<br>and once-in-a-lifetime deals.</p></div><form id="homeNewsletterForm"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form></section>
   </div>`;
 }
-function wireHome(){ wireCardEvents(qs("#app")); wireZmPromoHero(); }
+function novellaProductCard(p){
+  const isWish=state.wishlist.has(p.id); const image=p.image||(p.images&&p.images[0]);
+  const off=Number(p.was)>Number(p.price)?Math.round((1-Number(p.price)/Number(p.was))*100):0;
+  return `<article class="nov-product"><div class="nov-product__media"><button class="nov-product__wish ${isWish?'active':''}" data-wish="${esc(p.id)}" aria-label="Toggle wishlist">♡</button>${off?`<span class="nov-product__badge">-${off}%</span>`:''}${image?`<img src="${esc(image)}" alt="${esc(p.title)}" loading="lazy">`:`<div class="nov-product__placeholder">${ICONS[p.cat]||'✦'}</div>`}</div><div class="nov-product__body"><small>${esc(p.cat||'ZM Hybrid Store')}</small><h3><a href="${productPath(p)}" data-link>${esc(p.title)}</a></h3><div class="nov-rating"><span>${stars(p.rating||4.5)}</span><em>(${Math.round((p.rating||4.5)*137)})</em></div><div class="nov-price"><strong>${rupees(p.price)}</strong>${Number(p.was)>Number(p.price)?`<del>${rupees(p.was)}</del>`:''}<button data-add="${esc(p.id)}" aria-label="Add to cart">🛒</button></div></div></article>`;
+}
+function wireHome(){
+  const root=qs("#app");
+  wireCardEvents(root);
+  const nf=qs("#homeNewsletterForm",root);
+  if(nf) nf.addEventListener("submit",e=>{e.preventDefault(); const input=nf.querySelector("input"); toast(input?.value?"Thanks — you're on the list.":"Enter your email"); if(input) input.value="";});
+  wireZmPromoHero();
+}
 function wireZmPromoHero(){
   const root=qs('#zmPromoHero'); if(!root) return;
   const slides=qsa('.zm-promo-slide',root); if(!slides.length) return;
@@ -1100,7 +1102,7 @@ function wireCheckout(){
       sendOrderToSheet({...order,secureOrderId:created.order_id});
 
       const waLink=`https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${buildOrderText(order)}`;
-      if(CONFIG.WHATSAPP_NUMBER && CONFIG.WHATSAPP_NUMBER!=="923073659140") window.open(waLink,"_blank");
+      if(CONFIG.WHATSAPP_NUMBER && CONFIG.WHATSAPP_NUMBER!=="923000000000") window.open(waLink,"_blank");
 
       state.cart=[]; clearCoupon(); renderCartBadges(); renderCartDrawer();
       qs("#app").innerHTML=`
@@ -1109,7 +1111,7 @@ function wireCheckout(){
             <h2 style="margin-bottom:12px;">Thank you, ${window.esc(order.name.split(" ")[0])} — order ${window.esc(order.id)} received 🎉</h2>
             <p style="margin-bottom:12px;">Your order has been securely recorded. We'll contact you to confirm delivery.</p>
             <p style="margin-bottom:24px;">Total: <strong>${rupees(order.total)}</strong> · Payment: <strong>${window.esc(order.pay)}</strong></p>
-            ${CONFIG.WHATSAPP_NUMBER && CONFIG.WHATSAPP_NUMBER!=="923073659140" ? `<p style="margin-bottom:24px;">For faster confirmation: <a href="${waLink}" target="_blank" rel="noopener" style="text-decoration:underline;">Confirm on WhatsApp</a></p>` : ""}
+            ${CONFIG.WHATSAPP_NUMBER && CONFIG.WHATSAPP_NUMBER!=="923000000000" ? `<p style="margin-bottom:24px;">For faster confirmation: <a href="${waLink}" target="_blank" rel="noopener" style="text-decoration:underline;">Confirm on WhatsApp</a></p>` : ""}
             <a href="/catalog/" class="btn btn--primary" data-link>Continue shopping</a>
           </div>
         </div>`;
@@ -1205,7 +1207,7 @@ function viewContact(){
         </div>
         <div class="contact-info-item">
           <div class="icon-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 5c0 8 7 15 15 15l3-4-6-3-2 2c-2-1-4-3-5-5l2-2-3-6-4 0z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
-          <div><h4>Phone / WhatsApp</h4><p>+92 307 3659140</p></div>
+          <div><h4>Phone / WhatsApp</h4><p>+92 300 0000000</p></div>
         </div>
         <div class="contact-info-item">
           <div class="icon-circle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg></div>

@@ -74,7 +74,7 @@ Seedhi baat: **koi bharosemand cheez "hamesha free domain" nahi deti.**
 1. Hosting choose karein (Section 1).
 2. Deploy karein.
 3. `script.js` ke top par `CONFIG` object mein apna real WhatsApp number
-   daalein (abhi placeholder `923073659140` hai):
+   daalein (abhi placeholder `923000000000` hai):
    ```js
    WHATSAPP_NUMBER: "92XXXXXXXXXX",   // country code + number, no + or spaces
    ```

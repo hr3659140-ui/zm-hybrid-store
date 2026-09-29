@@ -549,103 +549,115 @@ function wireHeroCarousel(){
 }
 function viewHome(){
   const valid=PRODUCTS.filter(Boolean);
-  const byCat=(cat)=>valid.filter(p=>p.cat===cat && (p.image || (p.images&&p.images.length)))[0] || valid.find(p=>p.cat===cat) || {};
-  const cats=[
-    ['Health & Beauty','Beauty essentials','/category/health-and-beauty/'],
-    ['Home & Kitchen','Everyday upgrades','/category/home-and-kitchen/'],
-    ['Watches','Timeless pieces','/category/watches/'],
-    ['Fragrance','Signature scents','/category/fragrance/'],
-    ['Electronics','Smart picks','/category/electronics/'],
-    ['Fashion','Everyday style','/catalog/'],
-    ['Baby & Kids','Family picks','/catalog/'],
-    ['Home Essentials','Comfort & living','/category/home-and-kitchen/']
+  const A='/assets/novella/';
+  const firstImg=cat=>{const p=valid.find(x=>x.cat===cat&&(x.image||(x.images&&x.images.length)));return p?(p.image||p.images[0]):''};
+  const circles=[
+    ['Electronics','/category/electronics/',A+'cat-electronics.jpg'],
+    ['Watches','/category/watches/',A+'promo-watch.jpg'],
+    ['Home & Kitchen','/category/home-and-kitchen/',A+'cat-home.jpg'],
+    ['Health & Beauty','/category/health-and-beauty/',A+'cat-beauty.jpg'],
+    ['Fragrance','/category/fragrance/',firstImg('Fragrance')],
+    ['Top Deals','/catalog/?sale=1',A+'promo-percent.jpg'],
+    ['New Arrivals','/catalog/?sort=newest',A+'promo-shoe.jpg'],
+    ['All Products','/catalog/','']
   ];
-  const discounted=valid.filter(p=>Number(p.was||0)>Number(p.price||0));
-  const deals=(discounted.length?discounted:valid).slice(0,6);
-  const recommendations=valid.slice(6,11).length?valid.slice(6,11):valid.slice(0,5);
-  const categoryTiles=cats.map(([name,sub,url])=>{
-    const p=byCat(name); const img=p.image||(p.images&&p.images[0]);
-    return `<a href="${url}" class="nov-cat" data-link>${img?`<span class="nov-cat__img"><img src="${esc(img)}" alt="${esc(name)}" loading="lazy"></span>`:`<span class="nov-cat__img nov-cat__img--icon">${ICONS[name]||'✦'}</span>`}<strong>${esc(name)}</strong><small>${esc(sub)}</small></a>`;
-  }).join('');
-  const productRail=(items)=>items.map(novellaProductCard).join('');
-  const deal1=byCat('Watches'), deal2=byCat('Electronics'), deal3=byCat('Health & Beauty');
-  const img=(p)=>p?.image||(p?.images&&p.images[0])||'';
-  return `<div class="nov-home">
-    <section class="nov-hero">
-      <div class="nov-hero__copy">
-        <div class="nov-eyebrow">PREMIUM QUALITY <span>•</span> BEST PRICES <span>•</span> FAST DELIVERY</div>
-        <h1>Beauty and home essentials,<br><em>done right.</em></h1>
-        <p>Discover premium skincare, kitchen upgrades, watches, fragrance and more. Quality products, fair pricing, and fast delivery — all in one place.</p>
-        <div class="nov-hero__actions"><a class="nov-btn nov-btn--dark" href="/catalog/?sale=1" data-link>Shop the sale <span>→</span></a><a class="nov-btn nov-btn--outline" href="/category/health-and-beauty/" data-link>Explore beauty</a></div>
-        <div class="nov-hero__perks"><span>▣ <b>Secure Payments</b></span><span>◉ <b>Premium Quality</b></span><span>▱ <b>Fast Delivery</b></span></div>
+  const circleHtml=circles.map(c=>`<a href="${c[1]}" class="nv-circle" data-link><span class="nv-circle__img">${c[2]?`<img src="${esc(c[2])}" alt="${esc(c[0])}" loading="lazy">`:`<svg width="30" height="30" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.6"/></svg>`}</span><span class="nv-circle__label">${esc(c[0])}</span></a>`).join('');
+  const trending=valid.slice(0,5);
+  let recommended=valid.slice(5,10); if(recommended.length<5) recommended=valid.slice().reverse().slice(0,5);
+  const arrow='<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const head=(t,href,label)=>`<div class="nv-head"><h2>${t}</h2><a href="${href}" data-link>${label} ${arrow}</a></div>`;
+  return `<div class="nv-home">
+    <section class="nv-hero">
+      <div class="nv-hero__copy">
+        <span class="nv-eyebrow">QUALITY. STYLE. EVERYDAY.</span>
+        <h1>Everything You Love,<br><em>All in One Place.</em></h1>
+        <p>Shop top-quality products across all categories with unbeatable prices and a seamless experience.</p>
+        <a href="/catalog/" class="nv-btn-dark" data-link>Shop Now ${arrow}</a>
+        <ul class="nv-hero__perks">
+          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 10h18M8 15h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Secure Payments</li>
+          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 12l2.5 2.5 4.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Premium Quality</li>
+          <li><svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M2 6h11v10H2zM13 9h4l3 3v4h-7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.5"/><circle cx="16.5" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.5"/></svg>Fast Delivery</li>
+        </ul>
       </div>
-      <div class="nov-hero__visual"><div class="nov-hero__wash"></div><img src="/zm-novella-hero.jpg" alt="Premium ZM Hybrid Store home collection"></div>
+      <div class="nv-hero__img" style="background-image:url('${A}hero-room.jpg')" role="img" aria-label="Living room"></div>
     </section>
-    <section class="nov-section nov-categories">
-      <div class="nov-section__head"><div><h2>Shop by Category</h2></div><a href="/catalog/" data-link>View all categories <span>→</span></a></div>
-      <div class="nov-cat-grid">${categoryTiles}</div>
+
+    <section class="nv-block">
+      ${head('Shop by Category','/catalog/','View all categories')}
+      <div class="nv-circles">${circleHtml}</div>
     </section>
-    <section class="nov-promos">
-      <a class="nov-promo nov-promo--cream" href="/catalog/?sale=1" data-link><div><small>Deal of the Day</small><strong>Up to 50% Off</strong><span>On selected items only</span><b>Shop Deals →</b></div>${img(deal1)?`<img src="${esc(img(deal1))}" alt="Deal of the Day">`:''}</a>
-      <a class="nov-promo nov-promo--mint" href="/catalog/?sort=newest" data-link><div><small>New Arrivals</small><strong>Fresh Finds</strong><span>Check out the latest<br>products just for you</span><b>Explore Now →</b></div>${img(deal2)?`<img src="${esc(img(deal2))}" alt="New arrivals">`:''}</a>
-      <a class="nov-promo nov-promo--black" href="/catalog/?sale=1" data-link><div><small>Member Exclusive</small><strong>Extra 10% Off</strong><span>On prepaid orders<br>this weekend</span><b>Shop Now →</b></div>${img(deal3)?`<img src="${esc(img(deal3))}" alt="Member exclusive">`:''}</a>
+
+    <section class="nv-promos">
+      <a href="/catalog/?sale=1" class="nv-promo nv-promo--peach" data-link>
+        <div><small>Deal of the Day</small><h3>Up to 60% Off</h3><p>On selected items only</p><span class="nv-link">Shop Deals ${arrow}</span></div>
+        <img src="${A}promo-watch.jpg" alt="" loading="lazy">
+      </a>
+      <a href="/catalog/?sort=newest" class="nv-promo nv-promo--grey" data-link>
+        <div><small>New Arrivals</small><h3>Fresh Finds</h3><p>Check out the latest products just for you</p><span class="nv-link">Explore Now ${arrow}</span></div>
+        <img src="${A}promo-shoe.jpg" alt="" loading="lazy">
+      </a>
+      <a href="/catalog/?sale=1" class="nv-promo nv-promo--dark" data-link>
+        <div><small>Member Exclusive</small><h3>Extra 10% Off</h3><p>On prepaid orders this weekend</p><span class="nv-link">Shop Now ${arrow}</span></div>
+        <img src="${A}promo-percent.jpg" alt="" loading="lazy">
+      </a>
     </section>
-    <section class="nov-section">
-      <div class="nov-section__head"><div><h2>Trending Now</h2></div><a href="/catalog/" data-link>View all products <span>→</span></a></div>
-      <div class="nov-products nov-products--six">${productRail(deals)}</div>
+
+    <section class="nv-block">
+      ${head('Trending Now','/catalog/','View all products')}
+      <div class="nv-grid">${trending.map(productCard).join('')}</div>
     </section>
-    <section class="nov-benefits"><div><span class="nov-benefit-icon">♧</span><strong>Free Shipping</strong><small>On orders over $50</small></div><div><span class="nov-benefit-icon">↻</span><strong>Easy Returns</strong><small>7-day money back</small></div><div><span class="nov-benefit-icon">✓</span><strong>Secure Payments</strong><small>100% protected checkout</small></div><div><span class="nov-benefit-icon">◌</span><strong>24/7 Support</strong><small>We're here to help</small></div></section>
-    <section class="nov-section">
-      <div class="nov-section__head"><div><h2>Recommended for You</h2></div><a href="/catalog/?featured=1" data-link>View all recommendations <span>→</span></a></div>
-      <div class="nov-products nov-products--five">${productRail(recommendations)}</div>
+
+    <section class="nv-trust">
+      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M2 6h11v10H2zM13 9h4l3 3v4h-7" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><circle cx="7" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.3"/><circle cx="16.5" cy="17.5" r="1.7" stroke="currentColor" stroke-width="1.3"/></svg><span><strong>Free Shipping</strong><small>On orders over Rs. 5,000</small></span></div>
+      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.3"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><strong>Easy Returns</strong><small>7-day money back</small></span></div>
+      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 8h14l-1 12H6z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 14l2 2 3-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg><span><strong>Secure Payments</strong><small>100% protected checkout</small></span></div>
+      <div><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M4 13v-2a8 8 0 0 1 16 0v2" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="13" width="4" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="17" y="13" width="4" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M19 19c0 1.5-2 2.5-5 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg><span><strong>24/7 Support</strong><small>We're here to help</small></span></div>
     </section>
-    <section class="nov-newsletter"><div class="nov-newsletter__art"><span>✉</span></div><div><h2>Stay in the Loop</h2><p>Subscribe to get special offers, free giveaways,<br>and once-in-a-lifetime deals.</p></div><form id="homeNewsletterForm"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form></section>
+
+    <section class="nv-block">
+      ${head('Recommended for You','/catalog/?featured=1','View all recommendations')}
+      <div class="nv-grid">${recommended.map(productCard).join('')}</div>
+    </section>
+
+    <section class="nv-news">
+      <img src="${A}news-envelope.jpg" alt="" loading="lazy">
+      <div class="nv-news__copy"><h3>Stay in the Loop</h3><p>Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.</p></div>
+      <form id="newsletterForm" class="nv-news__form"><input type="email" placeholder="Enter your email" required><button type="submit">Subscribe</button></form>
+      <p class="footer-note" id="newsletterMsg"></p>
+    </section>
   </div>`;
 }
-function novellaProductCard(p){
-  const isWish=state.wishlist.has(p.id); const image=p.image||(p.images&&p.images[0]);
-  const off=Number(p.was)>Number(p.price)?Math.round((1-Number(p.price)/Number(p.was))*100):0;
-  return `<article class="nov-product"><div class="nov-product__media"><button class="nov-product__wish ${isWish?'active':''}" data-wish="${esc(p.id)}" aria-label="Toggle wishlist">♡</button>${off?`<span class="nov-product__badge">-${off}%</span>`:''}${image?`<img src="${esc(image)}" alt="${esc(p.title)}" loading="lazy">`:`<div class="nov-product__placeholder">${ICONS[p.cat]||'✦'}</div>`}</div><div class="nov-product__body"><small>${esc(p.cat||'ZM Hybrid Store')}</small><h3><a href="${productPath(p)}" data-link>${esc(p.title)}</a></h3><div class="nov-rating"><span>${stars(p.rating||4.5)}</span><em>(${Math.round((p.rating||4.5)*137)})</em></div><div class="nov-price"><strong>${rupees(p.price)}</strong>${Number(p.was)>Number(p.price)?`<del>${rupees(p.was)}</del>`:''}<button data-add="${esc(p.id)}" aria-label="Add to cart">🛒</button></div></div></article>`;
-}
 function wireHome(){
-  const root=qs("#app");
-  wireCardEvents(root);
-  const nf=qs("#homeNewsletterForm",root);
-  if(nf) nf.addEventListener("submit",e=>{e.preventDefault(); const input=nf.querySelector("input"); toast(input?.value?"Thanks — you're on the list.":"Enter your email"); if(input) input.value="";});
-  wireZmPromoHero();
-}
-function wireZmPromoHero(){
-  const root=qs('#zmPromoHero'); if(!root) return;
-  const slides=qsa('.zm-promo-slide',root); if(!slides.length) return;
-  const dots=qsa('.zm-promo-dot',root);
-  let active=0, timer=null;
-  const show=n=>{ active=(n+slides.length)%slides.length; slides.forEach((x,i)=>x.classList.toggle('is-active',i===active)); dots.forEach((x,i)=>x.classList.toggle('is-active',i===active)); };
-  const start=()=>{ clearInterval(timer); timer=setInterval(()=>show(active+1),4500); };
-  qs('#zmPromoNext',root)?.addEventListener('click',()=>{show(active+1);start();});
-  qs('#zmPromoPrev',root)?.addEventListener('click',()=>{show(active-1);start();});
-  dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);start();}));
-  root.addEventListener('mouseenter',()=>clearInterval(timer));
-  root.addEventListener('mouseleave',start);
-  start();
+  wireCardEvents(qs("#app"));
+  const f=qs("#newsletterForm");
+  if(f) f.addEventListener("submit",e=>{e.preventDefault();const m=qs("#newsletterMsg");if(m)m.textContent="You're subscribed — welcome!";e.target.reset();});
 }
 
 /* ---------- PRODUCT CARD (shared) ---------- */
 function productCard(p){
   const isWish = state.wishlist.has(p.id);
+  const r=Math.max(0,Math.min(5,Number(p.rating)||0));
+  const stars='★★★★★'.slice(0,Math.round(r))+'☆☆☆☆☆'.slice(0,5-Math.round(r));
+  const rc=Number(p.review_count||p.reviews_count||p.reviews||0);
+  const rcTxt=rc?` <span class="nv-rc">(${rc>=1000?(rc/1000).toFixed(1)+'k':rc})</span>`:'';
+  const hasWas=Number(p.was||0)>Number(p.price||0);
   return `
   <div class="card">
-    <div class="card__media ${MEDIA_CLASS[p.cat]}">
-      <span class="card__badge">${p.badge}</span>
+    <div class="card__media ${MEDIA_CLASS[p.cat]||''}">
+      ${p.badge?`<span class="card__badge">${p.badge}</span>`:''}
       <button class="card__wish ${isWish?'active':''}" data-wish="${p.id}" aria-label="Toggle wishlist">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="${isWish?'currentColor':'none'}"><path d="M12 20s-7.5-4.6-10-9.3C.6 7 2.4 3.6 6 3.2c2-.2 3.7.9 6 3.3 2.3-2.4 4-3.5 6-3.3 3.6.4 5.4 3.8 4 7.5C19.5 15.4 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
       </button>
-      ${p.image ? `<img src="${p.image}" alt="${p.title}" style="width:100%;height:100%;object-fit:cover;">` : (ICONS[p.cat] || "")}
+      <a href="${productPath(p)}" data-link class="card__imglink">${p.image ? `<img src="${p.image}" alt="${p.title}" loading="lazy">` : (ICONS[p.cat] || "")}</a>
     </div>
     <div class="card__body">
-      <span class="card__cat">${p.cat}</span>
       <div class="card__title"><a href="${productPath(p)}" data-link>${p.title}</a></div>
-      <div class="card__price"><span class="now">${rupees(p.price)}</span><span class="was">${rupees(p.was)}</span></div>
-      <button class="card__add" data-add="${p.id}">Add to cart</button>
+      <span class="card__cat">${p.cat}</span>
+      <div class="card__stars"><span>${stars}</span>${rcTxt}</div>
+      <div class="card__row">
+        <div class="card__price"><span class="now">${rupees(p.price)}</span>${hasWas?`<span class="was">${rupees(p.was)}</span>`:''}</div>
+        <button class="card__add" data-add="${p.id}" aria-label="Add to cart"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l1.6 10.6a2 2 0 0 0 2 1.7h8.2a2 2 0 0 0 2-1.6L20 8H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.3" fill="currentColor"/><circle cx="17" cy="20" r="1.3" fill="currentColor"/></svg></button>
+      </div>
     </div>
   </div>`;
 }

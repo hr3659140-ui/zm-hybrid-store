@@ -1,5 +1,7 @@
-# ZM Hybrid Store — explicit app entry points
+# ZM Hybrid Store — hard entry-point routing
 /admin /admin/index.html 200
 /admin/ /admin/index.html 200
+/admin/* /admin/index.html 200
 /affiliate /affiliate/index.html 200
 /affiliate/ /affiliate/index.html 200
+/affiliate/* /affiliate/index.html 200

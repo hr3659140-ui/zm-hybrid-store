@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-94TKM8BY1X"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-94TKM8BY1X');
+</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ZM Hybrid Store — Affiliate Portal</title><meta name="description" content="ZM Hybrid Store Affiliate Portal — choose products, generate product affiliate links and track commissions."><link rel="stylesheet" href="affiliate.css?v=202609291113"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head><body>
+<header><div class="brand"><span>ZM</span><div><b>ZM Hybrid Store</b><small>Affiliate Portal</small></div></div><nav><a href="/">Store</a><a href="#products">Products</a><a href="#dashboard">Dashboard</a></nav><div class="top-actions"><select id="marketSwitcher" aria-label="Shopping country"></select><span id="userLabel"></span><button id="authBtn">Login</button></div></header>
+<main>
+<section class="hero"><div><p class="eyebrow">ZM HYBRID STORE AFFILIATE PROGRAM</p><h1>Pick products. Get your own affiliate link. Earn on eligible sales.</h1><p>Affiliates can browse the store catalog, open any product and generate a unique product-specific link to share.</p><div class="hero-actions"><button id="joinBtn" class="primary">Join Affiliate Program</button><a class="ghost" href="#products">Browse products</a></div></div><div class="hero-card"><b>How it works</b><ol><li>Join and get your Affiliate ID.</li><li>Choose any product.</li><li>Click <b>Get Affiliate Link</b>.</li><li>Share the product link.</li><li>Eligible delivered orders create commission.</li><li>Request withdrawal when your approved balance reaches the minimum.</li></ol></div></section>
+<section id="dashboard" class="section"><div class="section-head"><div><p class="eyebrow">YOUR ACCOUNT</p><h2>Affiliate Dashboard</h2></div><button id="refreshBtn" class="ghost">Refresh</button></div><div id="dash"></div></section>
+<section id="products" class="section"><div class="section-head"><div><p class="eyebrow">PRODUCT MARKETPLACE</p><h2>Choose Products to Promote</h2><p class="muted">Every product gets its own affiliate link.</p></div><input id="search" class="search" placeholder="Search products…"></div><div id="productGrid" class="grid"><div class="loading">Loading products…</div></div></section>
+</main>
+<div id="modal" class="modal" hidden></div><footer>© ZM Hybrid Store · Affiliate Portal</footer><script src="affiliate.js?v=202609291113"></script></body></html>

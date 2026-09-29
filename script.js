@@ -24,7 +24,7 @@ const CONFIG = {
   // every order into a Google Sheet automatically. Leave "" to skip.
   ORDER_SHEET_WEBHOOK: "",
   // Google Analytics 4 Measurement ID, e.g. "G-XXXXXXXXXX". Leave "" to skip.
-  GA_MEASUREMENT_ID: "",
+  GA_MEASUREMENT_ID: "G-94TKM8BY1X",
   // Meta (Facebook/Instagram) Pixel ID. Leave "" to skip.
   META_PIXEL_ID: "",
   // Secure server-side checkout Edge Function. Deploy Phase 5 function before enabling.
@@ -274,6 +274,7 @@ function addToCart(id, qty=1, variantId=null){
   if(existing) existing.qty=nextQty;
   else state.cart.push({id, qty, variantId:variantId||null});
   saveState(); renderCartBadges(); renderCartDrawer(); toast("Added to cart");
+  trackAddToCart(product, variant, qty);
 }
 function removeFromCart(id, variantId=null){
   state.cart=state.cart.filter(i=>!(String(i.id)===String(id)&&String(i.variantId||"")===String(variantId||"")));
@@ -982,11 +983,33 @@ async function sendOrderToSheet(order){
 
 function trackPurchase(order){
   if(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function"){
-    gtag("event", "purchase", { transaction_id: order.id, value: Number(order.total||0)*activeMarket().rate, currency: activeMarket().currency });
+    gtag("event", "purchase", {
+      transaction_id: order.id,
+      value: Number(order.total||0)*activeMarket().rate,
+      currency: activeMarket().currency,
+      items: (order.items||[]).map(i=>({ item_id:String(i.id), item_name:i.title, quantity:i.qty, price:Number(i.price||0)*activeMarket().rate }))
+    });
   }
   if(CONFIG.META_PIXEL_ID && typeof fbq === "function"){
     fbq("track", "Purchase", { value: Number(order.total||0)*activeMarket().rate, currency: activeMarket().currency });
   }
+}
+function trackAddToCart(product, variant, qty){
+  if(!(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function")) return;
+  const price=Number(variant?.price ?? product?.price ?? 0)*activeMarket().rate;
+  gtag("event", "add_to_cart", {
+    currency: activeMarket().currency,
+    value: price*qty,
+    items: [{ item_id:String(product.id), item_name:product.title, item_category:product.cat, item_variant:variant?.name||undefined, price, quantity:qty }]
+  });
+}
+function trackBeginCheckout(){
+  if(!(CONFIG.GA_MEASUREMENT_ID && typeof gtag === "function")) return;
+  gtag("event", "begin_checkout", {
+    currency: activeMarket().currency,
+    value: Number(cartTotal()||0)*activeMarket().rate,
+    items: state.cart.map(i=>{ const p=findProduct(i.id); const v=getVariant(p,i.variantId); return { item_id:String(p.id), item_name:p.title, item_category:p.cat, item_variant:v?.name||undefined, price:Number(v?.price??p.price??0)*activeMarket().rate, quantity:i.qty }; })
+  });
 }
 
 async function createSecureOrder(order){
@@ -1017,6 +1040,7 @@ async function createSecureOrder(order){
 function wireCheckout(){
   const form = qs("#checkoutForm");
   if(!form) return;
+  trackBeginCheckout();
   const checkoutApply=qs("#checkoutApplyCoupon");
   qs("#ckCity")?.addEventListener("change", refreshShippingQuote);
   qs("#ckShippingMethod")?.addEventListener("change", e=>{selectedShippingMethod=e.target.value;refreshShippingQuote();});

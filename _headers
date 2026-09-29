@@ -4,3 +4,9 @@
   Content-Type: text/plain; charset=UTF-8
 /robots.txt
   Content-Type: text/plain; charset=UTF-8
+
+/admin/*
+  Cache-Control: no-cache, must-revalidate
+
+/affiliate/*
+  Cache-Control: no-cache, must-revalidate

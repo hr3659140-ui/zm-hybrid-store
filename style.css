@@ -1053,14 +1053,3 @@ body { min-height:100%; }
   .zm-promo-badge strong{font-size:1.1rem}
   .zm-promo-arrow{width:32px;height:32px}
 }
-
-/* ===== ZENVY additions ===== */
-.zn-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px}
-.zn-cat{text-align:center;text-decoration:none;color:var(--ink);font-weight:700}
-.zn-cat img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;display:block;margin-bottom:8px;border:1px solid var(--line)}
-.zn-feature{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px}
-.zn-feature__img img{width:100%;border-radius:12px}
-.zn-whys,.zn-revs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
-.zn-why,.zn-rev{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
-.zn-stars{color:var(--gold);letter-spacing:2px}
-@media(max-width:760px){.zn-feature{grid-template-columns:1fr}}

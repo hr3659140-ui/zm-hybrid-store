@@ -10,3 +10,9 @@ Edit later:
 - Men / Women menu links search products by keyword until you create those categories in admin.
 - Brand name text "ZM Hybrid Store": index.html and viewHome() in script.js.
 Deploy: upload this whole folder to Cloudflare Pages as before.
+
+## V12.1 fixes
+- Footer/header "Affiliate Portal" link opened the store's "Page not found" (SPA router). Now a normal link to /affiliate/.
+- Footer "Track Order" pointed to /track/ (404). Now /track-order/.
+- Admin (/admin/) and Affiliate (/affiliate/) code is unchanged from your original and tested: all 19 admin tabs and the affiliate login / link generation work with a mocked Supabase.
+- If login still fails, the cause is on the Supabase side (see checklist in chat): admin role in `profiles`, SQL phases run, email confirmation.

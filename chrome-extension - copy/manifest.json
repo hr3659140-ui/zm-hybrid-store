@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "ZM Hybrid Store \u2014 AliExpress One-Click Importer",
+  "version": "1.0.0",
+  "description": "Send AliExpress product data to the ZM Hybrid Store admin importer.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*.aliexpress.com/*",
+    "https://*.aliexpress.ru/*"
+  ],
+  "action": {
+    "default_title": "Import to ZM Hybrid Store",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.aliexpress.com/*",
+        "https://*.aliexpress.ru/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

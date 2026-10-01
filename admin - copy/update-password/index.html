@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-94TKM8BY1X"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-94TKM8BY1X');
+</script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>ZM Hybrid Store — Set New Password</title><link rel="stylesheet" href="../admin.css"></head><body>
+<div class="auth"><form id="resetForm" class="panel"><div class="brand-mark">ZM</div><h1>ZM HYBRID STORE</h1><p>Set a new admin password</p><input id="password" type="password" placeholder="New password" autocomplete="new-password" minlength="8" required><input id="confirm" type="password" placeholder="Confirm new password" autocomplete="new-password" minlength="8" required><button id="save" type="submit">Update password</button><small id="message" class="config-status" hidden></small><div class="login-note"><a href="/admin/">Back to Admin Login</a></div></form></div>
+<script>
+const SUPABASE_URL="https://iqgoclijgicgzncrjqqt.supabase.co";
+const KEY="sb_publishable_pmKqaLISXQHNJD7GidkErw_etZeZ1KU";
+const msg=document.getElementById("message"),btn=document.getElementById("save");
+function show(t,ok=false){msg.hidden=false;msg.textContent=t;msg.classList.toggle("error",!ok)}
+function tokenFromHash(){const h=new URLSearchParams(location.hash.slice(1));return {access:h.get("access_token"),type:h.get("type"),error:h.get("error_description")}}
+async function init(){const x=tokenFromHash();if(x.error){show(decodeURIComponent(x.error));return}if(x.type!=="recovery"||!x.access){show("This reset link is invalid or expired. Please request a new reset email.");return}sessionStorage.setItem("zm_reset_access_token",x.access);history.replaceState(null,"",location.pathname+location.search);}
+init();
+document.getElementById("resetForm").addEventListener("submit",async e=>{e.preventDefault();const p=document.getElementById("password").value,c=document.getElementById("confirm").value;if(p!==c){show("Passwords do not match.");return}if(p.length<8){show("Password must be at least 8 characters.");return}const token=sessionStorage.getItem("zm_reset_access_token");if(!token){show("Reset session missing. Request a new reset email.");return}btn.disabled=true;btn.textContent="Updating…";try{const r=await fetch(SUPABASE_URL+"/auth/v1/user",{method:"PUT",headers:{"Content-Type":"application/json","apikey":KEY,"Authorization":"Bearer "+token},body:JSON.stringify({password:p})});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||j.error_description||"Could not update password.");sessionStorage.removeItem("zm_reset_access_token");show("Password updated successfully. Redirecting to admin login…",true);setTimeout(()=>location.href="/admin/",1200)}catch(err){show(err.message)}finally{btn.disabled=false;btn.textContent="Update password"}});
+</script></body></html>

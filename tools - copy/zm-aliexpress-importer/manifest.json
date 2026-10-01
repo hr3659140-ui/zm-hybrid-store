@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "ZM Hybrid Store — AliExpress Importer",
+  "version": "1.0.0",
+  "description": "Send the current AliExpress product to ZM Hybrid Store Admin for one-click draft import.",
+  "permissions": ["activeTab", "scripting", "tabs"],
+  "host_permissions": ["https://www.aliexpress.com/*", "https://*.aliexpress.com/*", "https://zm-hybrid-store.pages.dev/*"],
+  "action": {"default_title": "Import to ZM Hybrid Store", "default_popup": "popup.html"}
+}
